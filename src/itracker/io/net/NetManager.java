@@ -4,8 +4,8 @@
  */
 package itracker.io.net;
 
-import itracker.io.manager.AbstractIoManager;
 import itracker.io.common.IRequest;
+import itracker.io.manager.AbstractIoManager;
 import itracker.util.Time;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,6 +44,7 @@ public class NetManager extends AbstractIoManager {
     public void setConnectionParams(String host, int port) {
         this.host = host;
         this.port = port;
+        closeConnection();
     }
     
     public long timeTillReconnect() {

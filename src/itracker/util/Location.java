@@ -16,6 +16,19 @@ public class Location implements ILocation {
     private double speed;
     private double course;
     private double accuracy;
+
+    static public Location fromParams(long time, double lat, double lon, double alt,
+        double speed, double course, double accuracy) {
+        Location loc = new Location();
+        loc.time = time;
+        loc.lat = lat;
+        loc.lon = lon;
+        loc.alt = alt;
+        loc.speed = speed;
+        loc.course = course;
+        loc.accuracy = accuracy;
+        return loc;
+    }
     
     static public Location fromLocation(ILocation l) {
         Location loc = new Location();

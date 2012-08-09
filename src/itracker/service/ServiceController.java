@@ -5,9 +5,9 @@
 package itracker.service;
 
 import itracker.collect.CollectController;
-import itracker.util.ILocation;
 import itracker.collect.common.IStoreListener;
 import itracker.io.IoController;
+import itracker.util.ILocation;
 import itracker.util.Text;
 
 /**
@@ -36,16 +36,44 @@ public class ServiceController implements IServiceController {
     Options options = new Options();    
     Status status = new Status();
     IoController io = new IoController();
-    CollectController collect = new CollectController();
+    CollectController collect = new CollectController();            
     ILocationController locationController = null;
         
+    @Override
     public void setLocationController(ILocationController lc) {
         locationController = lc;
     }
+    
+    IDataObserver dataObserver = new IDataObserver() {
+        @Override
+        public void onLocation(ILocation loc) {
+            collect.update(loc);
+        }
 
+        @Override
+        public void onAction(boolean state) {
+            collect.onAction(state);
+        }
+
+        @Override
+        public void onPower(boolean state) {
+            collect.onPower(state);
+        }
+
+        @Override
+        public void onKit(boolean state) {
+            collect.onKit(state);
+        }
+
+        @Override
+        public void onBattery(double state) {
+            collect.onBattery(state);
+        }
+    };
+    
     @Override
     public IDataObserver getDataObserver() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return dataObserver;
     }        
     
     
@@ -71,7 +99,7 @@ public class ServiceController implements IServiceController {
         io.startup();        
     }
     
-    Status getStatus() {
+    public Status getStatus() {
         status.io = io.getStatus();
         status.collect = collect.getStatus();
         return status;

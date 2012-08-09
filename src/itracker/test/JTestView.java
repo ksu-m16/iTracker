@@ -4,7 +4,10 @@
  */
 package itracker.test;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import itracker.service.ServiceController;
+import itracker.util.Location;
 import itracker.util.Time;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +46,6 @@ public class JTestView extends javax.swing.JFrame {
         bgNet = new javax.swing.ButtonGroup();
         bgFile = new javax.swing.ButtonGroup();
         bgTime = new javax.swing.ButtonGroup();
-        Status = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jlLoc = new javax.swing.JLabel();
@@ -80,21 +82,18 @@ public class JTestView extends javax.swing.JFrame {
         jrbTime0 = new javax.swing.JRadioButton();
         jrbTime5 = new javax.swing.JRadioButton();
         jrbTime10 = new javax.swing.JRadioButton();
-        jrbTime20 = new javax.swing.JRadioButton();
         jrbTime1 = new javax.swing.JRadioButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jtaStatus = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        Status.setText("jLabel1");
-        Status.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        Status.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jLabel2.setText("jLabel1");
         jLabel2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         jLabel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jPanel1.setName("");
+        jPanel1.setName(""); // NOI18N
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
         jlLoc.setText("Location");
@@ -160,7 +159,13 @@ public class JTestView extends javax.swing.JFrame {
         jPanel1.add(jlSpd, gridBagConstraints);
 
         bgSpd.add(jrbSpdNormal);
+        jrbSpdNormal.setSelected(true);
         jrbSpdNormal.setText("Normal (5 m/s)");
+        jrbSpdNormal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbSpdNormalActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -170,6 +175,11 @@ public class JTestView extends javax.swing.JFrame {
 
         bgSpd.add(jrbSpdLow);
         jrbSpdLow.setText("None (0 m/s)");
+        jrbSpdLow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbSpdLowActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
@@ -186,7 +196,13 @@ public class JTestView extends javax.swing.JFrame {
         jPanel1.add(jlAcc, gridBagConstraints);
 
         bgAcc.add(jrbAccHigh);
+        jrbAccHigh.setSelected(true);
         jrbAccHigh.setText("High (10)");
+        jrbAccHigh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbAccHighActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
@@ -196,6 +212,11 @@ public class JTestView extends javax.swing.JFrame {
 
         bgAcc.add(jrbAccLow);
         jrbAccLow.setText("Low (50)");
+        jrbAccLow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbAccLowActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
@@ -214,6 +235,11 @@ public class JTestView extends javax.swing.JFrame {
 
         bgBut.add(jrbButOn);
         jrbButOn.setText("On");
+        jrbButOn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbButOnActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -222,7 +248,13 @@ public class JTestView extends javax.swing.JFrame {
         jPanel1.add(jrbButOn, gridBagConstraints);
 
         bgBut.add(jrbButOff);
+        jrbButOff.setSelected(true);
         jrbButOff.setText("Off");
+        jrbButOff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbButOffActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 5;
@@ -241,6 +273,11 @@ public class JTestView extends javax.swing.JFrame {
 
         bgPwr.add(jrbPwrOn);
         jrbPwrOn.setText("On");
+        jrbPwrOn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbPwrOnActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 6;
@@ -249,7 +286,13 @@ public class JTestView extends javax.swing.JFrame {
         jPanel1.add(jrbPwrOn, gridBagConstraints);
 
         bgPwr.add(jrbPwrOff);
+        jrbPwrOff.setSelected(true);
         jrbPwrOff.setText("Off");
+        jrbPwrOff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbPwrOffActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;
@@ -281,7 +324,13 @@ public class JTestView extends javax.swing.JFrame {
         jPanel1.add(jrbCarOn, gridBagConstraints);
 
         bgCar.add(jrbCarOff);
+        jrbCarOff.setSelected(true);
         jrbCarOff.setText("Off");
+        jrbCarOff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbCarOffActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 7;
@@ -299,6 +348,7 @@ public class JTestView extends javax.swing.JFrame {
         jPanel1.add(jlBat, gridBagConstraints);
 
         bgBat.add(jrbBatNormal);
+        jrbBatNormal.setSelected(true);
         jrbBatNormal.setText("Normal (50%)");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -335,6 +385,7 @@ public class JTestView extends javax.swing.JFrame {
         jPanel1.add(jrbNetOn, gridBagConstraints);
 
         bgNet.add(jrbNetOff);
+        jrbNetOff.setSelected(true);
         jrbNetOff.setText("Disabled");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -362,6 +413,7 @@ public class JTestView extends javax.swing.JFrame {
         jPanel1.add(jrbFileOn, gridBagConstraints);
 
         bgFile.add(jrbFileOff);
+        jrbFileOff.setSelected(true);
         jrbFileOff.setText("Disabled");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -381,8 +433,13 @@ public class JTestView extends javax.swing.JFrame {
 
         bgTime.add(jrbTime0);
         jrbTime0.setText("pause");
+        jrbTime0.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbTime0ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 14;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
@@ -390,39 +447,50 @@ public class JTestView extends javax.swing.JFrame {
 
         bgTime.add(jrbTime5);
         jrbTime5.setText("x5");
+        jrbTime5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbTime5ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         jPanel1.add(jrbTime5, gridBagConstraints);
 
         bgTime.add(jrbTime10);
         jrbTime10.setText("x10");
+        jrbTime10.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbTime10ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 13;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         jPanel1.add(jrbTime10, gridBagConstraints);
 
-        bgTime.add(jrbTime20);
-        jrbTime20.setText("x20");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
-        jPanel1.add(jrbTime20, gridBagConstraints);
-
         bgTime.add(jrbTime1);
+        jrbTime1.setSelected(true);
         jrbTime1.setText("x1");
+        jrbTime1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbTime1ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 13;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         jPanel1.add(jrbTime1, gridBagConstraints);
+
+        jtaStatus.setColumns(20);
+        jtaStatus.setRows(5);
+        jScrollPane1.setViewportView(jtaStatus);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -431,10 +499,10 @@ public class JTestView extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(Status, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 424, Short.MAX_VALUE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -445,7 +513,7 @@ public class JTestView extends javax.swing.JFrame {
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Status, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -453,31 +521,109 @@ public class JTestView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jrbCarOnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbCarOnActionPerformed
-        // TODO add your handling code here:
+        service.getDataObserver().onKit(true);
     }//GEN-LAST:event_jrbCarOnActionPerformed
 
-    
+    private void jrbTime1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbTime1ActionPerformed
+        timeFactor = 10;
+    }//GEN-LAST:event_jrbTime1ActionPerformed
+
+    private void jrbTime5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbTime5ActionPerformed
+        timeFactor = 2;
+    }//GEN-LAST:event_jrbTime5ActionPerformed
+
+    private void jrbTime10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbTime10ActionPerformed
+        timeFactor = 1;
+    }//GEN-LAST:event_jrbTime10ActionPerformed
+
+    private void jrbTime0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbTime0ActionPerformed
+        timeFactor = 0;
+    }//GEN-LAST:event_jrbTime0ActionPerformed
+
+    private void jrbAccHighActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbAccHighActionPerformed
+        accuracy = 10;
+    }//GEN-LAST:event_jrbAccHighActionPerformed
+
+    private void jrbAccLowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbAccLowActionPerformed
+        accuracy = 50;
+    }//GEN-LAST:event_jrbAccLowActionPerformed
+
+    private void jrbSpdNormalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbSpdNormalActionPerformed
+        speed = 5;
+    }//GEN-LAST:event_jrbSpdNormalActionPerformed
+
+    private void jrbSpdLowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbSpdLowActionPerformed
+        speed = 0;
+    }//GEN-LAST:event_jrbSpdLowActionPerformed
+
+    private void jrbButOnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbButOnActionPerformed
+        service.getDataObserver().onAction(true);
+    }//GEN-LAST:event_jrbButOnActionPerformed
+
+    private void jrbButOffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbButOffActionPerformed
+        service.getDataObserver().onAction(false);
+    }//GEN-LAST:event_jrbButOffActionPerformed
+
+    private void jrbPwrOnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbPwrOnActionPerformed
+        service.getDataObserver().onPower(true);
+    }//GEN-LAST:event_jrbPwrOnActionPerformed
+
+    private void jrbPwrOffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbPwrOffActionPerformed
+        service.getDataObserver().onPower(false);
+    }//GEN-LAST:event_jrbPwrOffActionPerformed
+
+    private void jrbCarOffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbCarOffActionPerformed
+        service.getDataObserver().onKit(false);
+    }//GEN-LAST:event_jrbCarOffActionPerformed
+        
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
     ServiceController service = new ServiceController();    
+    {
+        service.startup();
+    }
     
     static {
         Time.setTimeProvider(Time.DebugTime.getInstance());        
     }
     Time.DebugTime time = Time.DebugTime.getInstance();
-    int timeFactor = 0;
+    int timeFactor = 10;
+    double speed = 5;
+    double accuracy = 10;
+    
+    long oldTime = 0;
     Thread generator = new Thread() {
         @Override
         public void run() {
-            for (int i = 0; i < timeFactor * 4; ++i) {
-                try {
-                    sleep(25);
-                } catch (InterruptedException ex) {                    
+            while(true) {                
+                if (timeFactor == 0) {
+                    try {
+                        sleep(25);
+                    } catch (InterruptedException ex) {
+                    }
+                    continue;
                 }
+                for (int i = 0; i < timeFactor; ++i) {
+                    try {
+                        sleep(25);
+                    } catch (InterruptedException ex) {                    
+                    }                                                        
+                }                            
                 time.time += 250;
+                String status = gson.toJson(service.getStatus());
+                jtaStatus.setText(status);
+                
+                if (time.time - oldTime >= 1000) {
+                    Location l = Location.fromParams(time.current(), 
+                        0, 0, 0, speed, 0, accuracy);                    
+                    service.getDataObserver().onLocation(l);
+                    oldTime = time.time;
+                }
             }
-            
-            
         }        
     };
+            {
+                generator.start();
+            }
     
     /**
      * @param args the command line arguments
@@ -521,7 +667,6 @@ public class JTestView extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel Status;
     private javax.swing.ButtonGroup bgAcc;
     private javax.swing.ButtonGroup bgBat;
     private javax.swing.ButtonGroup bgBut;
@@ -535,6 +680,7 @@ public class JTestView extends javax.swing.JFrame {
     private javax.swing.ButtonGroup bgTime;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel jlAcc;
     private javax.swing.JLabel jlBat;
     private javax.swing.JLabel jlBut;
@@ -569,7 +715,7 @@ public class JTestView extends javax.swing.JFrame {
     private javax.swing.JRadioButton jrbTime0;
     private javax.swing.JRadioButton jrbTime1;
     private javax.swing.JRadioButton jrbTime10;
-    private javax.swing.JRadioButton jrbTime20;
     private javax.swing.JRadioButton jrbTime5;
+    private javax.swing.JTextArea jtaStatus;
     // End of variables declaration//GEN-END:variables
 }

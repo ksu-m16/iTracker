@@ -4,10 +4,10 @@
  */
 package itracker.io;
 
-import itracker.io.manager.AbstractIoManager;
-import itracker.io.file.FileManager;
 import itracker.io.common.IRequest;
 import itracker.io.common.IResultListener;
+import itracker.io.file.FileManager;
+import itracker.io.manager.AbstractIoManager;
 import itracker.io.manager.IoManager;
 import itracker.io.mem.MemManager;
 import itracker.io.net.NetManager;
@@ -15,7 +15,6 @@ import itracker.util.Log;
 import itracker.util.Text;
 import itracker.util.Time;
 import java.io.File;
-import java.io.PrintStream;
 
 /**
  *
@@ -139,6 +138,7 @@ public class IoController {
     IoUpdater ioUpdater;
     private void startIoUpdater() {
         stopIoUpdater();
+        ioUpdater = new IoUpdater();
         ioUpdater.start();
     }
     
