@@ -4,6 +4,8 @@
  */
 package itracker.service;
 
+import itracker.util.ILocation;
+
 /**
  *
  * @author Igor Kernitskiy
