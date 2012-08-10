@@ -350,6 +350,11 @@ public class JTestView extends javax.swing.JFrame {
         bgBat.add(jrbBatNormal);
         jrbBatNormal.setSelected(true);
         jrbBatNormal.setText("Normal (50%)");
+        jrbBatNormal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbBatNormalActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
@@ -359,6 +364,11 @@ public class JTestView extends javax.swing.JFrame {
 
         bgBat.add(jrbBatLow);
         jrbBatLow.setText("Empty (10%)");
+        jrbBatLow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbBatLowActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 8;
@@ -446,7 +456,7 @@ public class JTestView extends javax.swing.JFrame {
         jPanel1.add(jrbTime0, gridBagConstraints);
 
         bgTime.add(jrbTime5);
-        jrbTime5.setText("x5");
+        jrbTime5.setText("x100");
         jrbTime5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jrbTime5ActionPerformed(evt);
@@ -525,15 +535,15 @@ public class JTestView extends javax.swing.JFrame {
     }//GEN-LAST:event_jrbCarOnActionPerformed
 
     private void jrbTime1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbTime1ActionPerformed
-        timeFactor = 10;
+        timeFactor = 100;
     }//GEN-LAST:event_jrbTime1ActionPerformed
 
     private void jrbTime5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbTime5ActionPerformed
-        timeFactor = 2;
+        timeFactor = 1;
     }//GEN-LAST:event_jrbTime5ActionPerformed
 
     private void jrbTime10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbTime10ActionPerformed
-        timeFactor = 1;
+        timeFactor = 10;
     }//GEN-LAST:event_jrbTime10ActionPerformed
 
     private void jrbTime0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbTime0ActionPerformed
@@ -575,47 +585,63 @@ public class JTestView extends javax.swing.JFrame {
     private void jrbCarOffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbCarOffActionPerformed
         service.getDataObserver().onKit(false);
     }//GEN-LAST:event_jrbCarOffActionPerformed
+
+    private void jrbBatNormalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbBatNormalActionPerformed
+        battery = 50;
+    }//GEN-LAST:event_jrbBatNormalActionPerformed
+
+    private void jrbBatLowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbBatLowActionPerformed
+        battery = 10;
+    }//GEN-LAST:event_jrbBatLowActionPerformed
         
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     ServiceController service = new ServiceController();    
     {
-        service.startup();
+        service.startup();        
     }
     
     static {
         Time.setTimeProvider(Time.DebugTime.getInstance());        
     }
     Time.DebugTime time = Time.DebugTime.getInstance();
-    int timeFactor = 10;
+    int timeFactor = 100;
     double speed = 5;
     double accuracy = 10;
+    double battery = 50;
     
     long oldTime = 0;
+    long lastStatusUpdateTime = 0;
+    
     Thread generator = new Thread() {
+        
+        public void pause(long time) {
+            long start = System.currentTimeMillis();
+            while (System.currentTimeMillis() - start < time);
+        }
+        
+        
         @Override
         public void run() {
-            while(true) {                
+            while(true) {
                 if (timeFactor == 0) {
-                    try {
-                        sleep(25);
-                    } catch (InterruptedException ex) {
-                    }
+                    pause(10);
                     continue;
                 }
                 for (int i = 0; i < timeFactor; ++i) {
-                    try {
-                        sleep(25);
-                    } catch (InterruptedException ex) {                    
-                    }                                                        
-                }                            
-                time.time += 250;
-                String status = gson.toJson(service.getStatus());
-                jtaStatus.setText(status);
+                    pause(10);
+                    time.time += 1000 / timeFactor;
+                }
+                
+                if (System.currentTimeMillis() - lastStatusUpdateTime > 200) {
+                    String status = gson.toJson(service.getStatus());
+                    jtaStatus.setText(status);
+                }
                 
                 if (time.time - oldTime >= 1000) {
                     Location l = Location.fromParams(time.current(), 
                         0, 0, 0, speed, 0, accuracy);                    
                     service.getDataObserver().onLocation(l);
+                    service.getDataObserver().onBattery(battery);
                     oldTime = time.time;
                 }
             }

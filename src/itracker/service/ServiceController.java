@@ -82,7 +82,7 @@ public class ServiceController implements IServiceController {
             @Override
             public void store(ILocation l) {                
                 String sample = String.format(
-                    "<gps i=%s t=%l x=%s y=%s z=%s s=%s c=%s a=%s>", 
+                    "<gps i=%s t=%d x=%s y=%s z=%s s=%s c=%s a=%s>", 
                     options.credentials.imei,
                     l.getTime(),
                     Text.formatDouble8(l.getLat()),

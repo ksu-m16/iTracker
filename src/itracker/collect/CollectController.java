@@ -33,12 +33,13 @@ public class CollectController {
     }
     
     public static class Status {
-        public boolean action;
-        public boolean power;
-        public boolean kit;
-        public double battery;        
-        public String state;
-        public String strategy;
+        public boolean action = false;
+        public boolean power = false;
+        public boolean kit = false;
+        public double battery = 100;        
+        public String state = "UNKNOWN";
+        public String strategy = "UNKNOWN";
+        public boolean ready = true;
         public Location location = new Location();
     }
      
@@ -87,6 +88,7 @@ public class CollectController {
         }        
         currentStrategy = strategy;        
         currentStrategy.reset();        
+        status.strategy = currentStrategy.getName();
         return true;
     }
                             
@@ -127,11 +129,12 @@ public class CollectController {
     }
     
     public void update(ILocation l) {
-        status.location = Location.fromLocation(l);
+        status.location = Location.fromLocation(l);        
         currentStrategy.update(l);        
     }
     
-    public Status getStatus() {
+    public Status getStatus() {        
+        status.ready = isReady();
         return status;
     }
 }

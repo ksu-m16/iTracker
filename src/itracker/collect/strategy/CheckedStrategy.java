@@ -69,6 +69,7 @@ public class CheckedStrategy extends AbstractStrategy {
         for(ILocation l : cachedLocations) {
             super.update(l);            
         }
+        lastUpdateTime = Time.current();
         stopped = false;        
     }    
     

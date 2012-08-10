@@ -12,4 +12,9 @@ public class Log {
     public static void d(Class source, String msg) {
         System.out.println(Text.formatCurrentTimestamp() + " [" + source.getSimpleName() + "]: " + msg);
     }
+    
+    public static void d(Object source, String msg) {        
+        d(source.getClass(), msg);
+    }
+    
 }

@@ -68,10 +68,11 @@ public class IoController {
         private boolean running = true;
         
         public boolean checkIoManager(AbstractIoManager iom) {
-            if (iom.hasErrors()) {
-                Log.d(this.getClass(), "io[" + iom.getName() + "] reported errors: " + iom.getErrorString());
+            if (!iom.hasErrors()) {
+                return false;                
             }
-            Log.d(this.getClass(), "restarting io[" + iom.getName() + "]");
+            Log.d(this, "io[" + iom.getName() + "] reported errors: " + iom.getErrorString());                
+            Log.d(this, "restarting io[" + iom.getName() + "]");
             iom.restart();
             return true;
         }
@@ -153,7 +154,7 @@ public class IoController {
         private static final IResultListener listener = new IResultListener() {
             @Override
             public void onSuccess(IoManager m, IRequest rq) {            
-                Log.d(this.getClass(), "io[" + m.getName() + "] reported success for '" + rq.getName() + "'");
+                Log.d(rq, "io[" + m.getName() + "] reported success for '" + rq.getName() + "'");
             }
 
             @Override
@@ -162,15 +163,13 @@ public class IoController {
                     return;
                 }          
                 IORequest iorq = (IORequest)rq;
-                Log.d(this.getClass(), "io[" + m.getName() + "] reported error for '" 
+                Log.d(iorq, "io[" + m.getName() + "] reported error for '" 
                     + rq.getName() + "': " + errorMessage);
                 
                 if (iorq.schedule()) {
                     return;
-                }
-                synchronized(System.out) {
-                    Log.d(this.getClass(), "io stack for '" + rq.getName() + "' is empty, data discarded");                    
-                }
+                }                
+                Log.d(iorq, "io stack for '" + rq.getName() + "' is empty, data discarded");                                    
             }
         };
         
@@ -197,11 +196,13 @@ public class IoController {
             this.setName("input");
         }
         
-        public boolean schedule() {
+        public synchronized boolean schedule() {
             if (stackIndex >= stack.length) {
                 return false;
-            }
+            }            
             stack[stackIndex].store(this);
+            Log.d(this, "scheduled '" + this.getName() 
+                + "' for io[" + stack[stackIndex].getName() + "]");
             stackIndex++;
             return true;
         }
