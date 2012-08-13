@@ -623,13 +623,14 @@ public class JTestView extends javax.swing.JFrame {
         @Override
         public void run() {
             while(true) {
-                if (timeFactor == 0) {
+                long tf = timeFactor;
+                if (tf == 0) {
                     pause(10);
                     continue;
-                }
-                for (int i = 0; i < timeFactor; ++i) {
+                }                
+                for (int i = 0; i < tf; ++i) {
                     pause(10);
-                    time.time += 1000 / timeFactor;
+                    time.time += 1000 / tf;
                 }
                 
                 if (System.currentTimeMillis() - lastStatusUpdateTime > 200) {

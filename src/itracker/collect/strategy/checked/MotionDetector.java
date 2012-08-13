@@ -244,6 +244,7 @@ public class MotionDetector {
         if (badSpeedCount >= totalCount) {
             Log.d(this.getClass(), "updateMotionContinued: completely bad speed (mc: false)");
             motionContinued = false;
+            return;
         }
         
         Log.d(this.getClass(), "updateMotionDetected: all tested passed (mc: true)");

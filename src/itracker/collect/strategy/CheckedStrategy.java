@@ -7,6 +7,7 @@ package itracker.collect.strategy;
 import itracker.util.ILocation;
 import itracker.collect.common.IStoreListener;
 import itracker.collect.strategy.checked.MotionDetector;
+import itracker.util.Log;
 import itracker.util.Time;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,12 +19,12 @@ import java.util.List;
 public class CheckedStrategy extends AbstractStrategy {
     private long noLocationTimeout = 300;
     private long stopTimeout = 600;
-    private long retryInterval = 300;
-    private long retryDuration = 30;
+    private long testInterval = 300;
+    private long testDuration = 30;
     private int retryAccuracyCount = 4;
     
     private long lastUpdateTime = 0;
-    private long lastRetryTime = 0;
+    private long lastTestTime = 0;
     private int retryCount = 0;
     private boolean stopped = false;
     
@@ -39,18 +40,18 @@ public class CheckedStrategy extends AbstractStrategy {
     }
 
     public void setRetryInterval(long retryInterval) {
-        this.retryInterval = retryInterval;
+        this.testInterval = retryInterval;
     }
 
     public void setRetryDuration(long retryDuration) {
-        this.retryDuration = retryDuration;
+        this.testDuration = retryDuration;
         configureMotionDetector();
     }
     
     private void configureMotionDetector() {        
-        motionDetector.setSampleSize((int)retryDuration);
+        motionDetector.setSampleSize((int)testDuration);
         motionDetector.setMotionContinuedTestSamples(
-            (int)(Math.ceil((double) stopTimeout / (double) retryDuration)));        
+            (int)(Math.ceil((double) stopTimeout / (double) testDuration)));        
         motionDetector.setMotionDetectedAccuracySamples(retryAccuracyCount);
     }
 
@@ -62,7 +63,7 @@ public class CheckedStrategy extends AbstractStrategy {
     private void stopCollection() {
         stopped = true;
         retry = false;
-        lastRetryTime = Time.current();
+        lastTestTime = Time.current();
     }
     
     private void startCollection() {
@@ -78,49 +79,63 @@ public class CheckedStrategy extends AbstractStrategy {
             stopCollection();
             return false;
         }
+
+        if (Time.current() - lastTestTime < testDuration * 1000) {
+            return true;
+        }       
+        
+        lastTestTime = Time.current();        
+        motionDetector.update(testLocations);
+        testLocations.clear();        
+        
         if (motionDetector.isStopDetected()) {
             stopCollection();
             return false;
         }
+        
         return true;
     }
     
     boolean retry = false;
-    List<ILocation> retryLocations = new LinkedList<ILocation>();
+    List<ILocation> testLocations = new LinkedList<ILocation>();
     List<ILocation> cachedLocations = new LinkedList<ILocation>();
     private boolean isReadyStopped() {
         //check if we are not in retry attempt
         if (!retry) {
             //if duration for next retry is elapsed then start retry attempt
-            if (Time.current() - lastRetryTime > retryInterval * 1000) {
-                lastRetryTime = Time.current();
+            if (Time.current() - lastTestTime > testInterval * 1000) {
+                lastTestTime = Time.current();
                 retryCount = 0;
-                retryLocations.clear();
+                testLocations.clear();
                 cachedLocations.clear();
                 retry = true;
                 return true;
             }
+
+            return false;
         }        
         
         //check if retry duration is not elapsed
-        if (Time.current() - lastRetryTime < retryDuration * 1000) {
+        if (Time.current() - lastTestTime < testDuration * 1000) {
             return true;
         }
+        lastTestTime = Time.current();
         
-        motionDetector.update(retryLocations);
-        cachedLocations.addAll(retryLocations);
-        retryLocations.clear();
+        motionDetector.update(testLocations);
+        cachedLocations.addAll(testLocations);
+        testLocations.clear();
         
         if (motionDetector.isMotionDetected()) {            
             startCollection();
             return true;
         }
         
-        //check if accuracy is bad, then wait for next retry
+        //check if accuracy is good, then wait for next retry
         if (motionDetector.isAccuracyGood()) {
             //check if we can still collect samples for good accuracy test
+            retryCount++;
+            Log.d(this, "accuracy is good, retry #" + retryCount);
             if (retryCount < retryAccuracyCount) {
-                lastRetryTime = Time.current();
                 return true;
             }            
         }
@@ -139,9 +154,9 @@ public class CheckedStrategy extends AbstractStrategy {
     @Override
     public void update(ILocation loc) {                        
         lastUpdateTime = Time.current();
-
-        if (stopped) {
-            retryLocations.add(loc);
+        testLocations.add(loc);
+        
+        if (stopped) {            
             return;
         } 
 
@@ -150,7 +165,7 @@ public class CheckedStrategy extends AbstractStrategy {
 
     @Override
     public void reset() {
-        retryLocations.clear();        
+        testLocations.clear();        
         cachedLocations.clear();        
         motionDetector.reset();
         startCollection();        
