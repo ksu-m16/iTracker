@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.regex.Pattern;
+import sun.rmi.runtime.Log;
 
 
 /**
@@ -38,7 +39,8 @@ public class FileManager extends CacheManager {
             FileInputStream fis = null;
             try {
                 fis = new FileInputStream(file);
-                byte[] data = new byte[(int)file.length()];                
+                byte[] data = new byte[(int)file.length()];
+                fis.read(data);
                 return new String(data);                                            
             } catch (IOException ex) {
                 FileManager.this.deinit();
@@ -64,8 +66,8 @@ public class FileManager extends CacheManager {
             if (file == null) {
                 return;
             }        
-            String name = file.getName();
-            name.replace(".cache", ".removed");
+            String name = file.getName();           
+            name = name.replace(".cache", ".removed");
             file.renameTo(new File(name));
             file = null;
         }
@@ -154,9 +156,9 @@ public class FileManager extends CacheManager {
         }
 
         try {
-            dataFile = new File(dataFolder + "/" 
+            dataFile = new File(dataFolder + "/track-" 
                 + Text.formatCurrentTimestamp() 
-                + "-" + Text.randomHash());                           
+                + "-" + Text.randomHash() + ".cache");                           
             dataOs = new FileOutputStream(dataFile);                
         } catch(IOException ex) {
             deinit();
