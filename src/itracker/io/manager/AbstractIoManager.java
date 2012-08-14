@@ -7,6 +7,8 @@ package itracker.io.manager;
 import itracker.io.common.IRequest;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -15,6 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public abstract class AbstractIoManager implements IoManager {    
     private final Queue<IRequest> inQueue = new ConcurrentLinkedQueue<IRequest>();            
 
+    private long stopTimeout = 1000;
     private IOThread thread = null;
     Exception startupException = null;
     Exception processException = null;
@@ -89,7 +92,14 @@ public abstract class AbstractIoManager implements IoManager {
             }
         }        
     }
+
+    public long getStopTimeout() {
+        return stopTimeout;
+    }    
     
+    public void setStopTimeout(long stopTimeout) {
+        this.stopTimeout = stopTimeout;
+    }        
     
     protected void waitForRequest() {
         synchronized(inQueue) {
@@ -126,6 +136,11 @@ public abstract class AbstractIoManager implements IoManager {
         }
         thread.running = false;
         notifyOfRequest();
+        try {            
+            thread.join(stopTimeout);
+        } catch (InterruptedException ex) {            
+        }
+        thread = null;
     }
     
     public synchronized void restart() {        

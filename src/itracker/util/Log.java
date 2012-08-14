@@ -16,5 +16,8 @@ public class Log {
     public static void d(Object source, String msg) {        
         d(source.getClass(), msg);
     }
-    
+
+    public static void e(Object source, Exception ex) {        
+        d(source.getClass(), ex.getClass().getSimpleName() + " : " + ex.getMessage());
+    }    
 }

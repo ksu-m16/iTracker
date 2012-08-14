@@ -8,7 +8,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import itracker.service.ServiceController;
 import itracker.util.Location;
+import itracker.util.Log;
 import itracker.util.Time;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
+import java.nio.CharBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,7 +55,6 @@ public class JTestView extends javax.swing.JFrame {
         bgNet = new javax.swing.ButtonGroup();
         bgFile = new javax.swing.ButtonGroup();
         bgTime = new javax.swing.ButtonGroup();
-        jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jlLoc = new javax.swing.JLabel();
         jrbLocOn = new javax.swing.JRadioButton();
@@ -85,12 +93,10 @@ public class JTestView extends javax.swing.JFrame {
         jrbTime1 = new javax.swing.JRadioButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jtaStatus = new javax.swing.JTextArea();
+        jspNetwork = new javax.swing.JScrollPane();
+        jtfNetwork = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jLabel2.setText("jLabel1");
-        jLabel2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        jLabel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setName(""); // NOI18N
@@ -106,7 +112,13 @@ public class JTestView extends javax.swing.JFrame {
         jPanel1.add(jlLoc, gridBagConstraints);
 
         bgLoc.add(jrbLocOn);
+        jrbLocOn.setSelected(true);
         jrbLocOn.setText("Enabled");
+        jrbLocOn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbLocOnActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -116,6 +128,11 @@ public class JTestView extends javax.swing.JFrame {
 
         bgLoc.add(jrbLocOff);
         jrbLocOff.setText("Disabled");
+        jrbLocOff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbLocOffActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -132,7 +149,13 @@ public class JTestView extends javax.swing.JFrame {
         jPanel1.add(jlFreq, gridBagConstraints);
 
         bgFreq.add(jrbFreqNormal);
+        jrbFreqNormal.setSelected(true);
         jrbFreqNormal.setText("Normal (1Hz)");
+        jrbFreqNormal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbFreqNormalActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -142,6 +165,11 @@ public class JTestView extends javax.swing.JFrame {
 
         bgFreq.add(jrbFreqLow);
         jrbFreqLow.setText("Low(0.5Hz)");
+        jrbFreqLow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbFreqLowActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -387,6 +415,11 @@ public class JTestView extends javax.swing.JFrame {
 
         bgNet.add(jrbNetOn);
         jrbNetOn.setText("Enabled");
+        jrbNetOn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbNetOnActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 10;
@@ -397,6 +430,11 @@ public class JTestView extends javax.swing.JFrame {
         bgNet.add(jrbNetOff);
         jrbNetOff.setSelected(true);
         jrbNetOff.setText("Disabled");
+        jrbNetOff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbNetOffActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 10;
@@ -415,6 +453,11 @@ public class JTestView extends javax.swing.JFrame {
 
         bgFile.add(jrbFileOn);
         jrbFileOn.setText("Enabled");
+        jrbFileOn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbFileOnActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 11;
@@ -425,6 +468,11 @@ public class JTestView extends javax.swing.JFrame {
         bgFile.add(jrbFileOff);
         jrbFileOff.setSelected(true);
         jrbFileOff.setText("Disabled");
+        jrbFileOff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jrbFileOffActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 11;
@@ -502,6 +550,10 @@ public class JTestView extends javax.swing.JFrame {
         jtaStatus.setRows(5);
         jScrollPane1.setViewportView(jtaStatus);
 
+        jtfNetwork.setColumns(20);
+        jtfNetwork.setRows(5);
+        jspNetwork.setViewportView(jtfNetwork);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -512,18 +564,19 @@ public class JTestView extends javax.swing.JFrame {
                     .addComponent(jScrollPane1)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
+                .addComponent(jspNetwork, javax.swing.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jspNetwork, javax.swing.GroupLayout.DEFAULT_SIZE, 831, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -593,11 +646,100 @@ public class JTestView extends javax.swing.JFrame {
     private void jrbBatLowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbBatLowActionPerformed
         battery = 10;
     }//GEN-LAST:event_jrbBatLowActionPerformed
+
+    private void jrbLocOnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbLocOnActionPerformed
+        locationOn = true;
+    }//GEN-LAST:event_jrbLocOnActionPerformed
+
+    private void jrbLocOffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbLocOffActionPerformed
+        locationOn = false;
+    }//GEN-LAST:event_jrbLocOffActionPerformed
+
+    private void jrbFreqNormalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbFreqNormalActionPerformed
+        skip = 1;
+    }//GEN-LAST:event_jrbFreqNormalActionPerformed
+
+    private void jrbFreqLowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbFreqLowActionPerformed
+        skip = 2;
+    }//GEN-LAST:event_jrbFreqLowActionPerformed
+
+    private void jrbFileOnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbFileOnActionPerformed
+        ServiceController.Options opt = service.getOptions();
+        opt.io.cache.dataFolder = ".";
+        service.setOptions(opt);        
+    }//GEN-LAST:event_jrbFileOnActionPerformed
+
+    private void jrbFileOffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbFileOffActionPerformed
+        ServiceController.Options opt = service.getOptions();
+        opt.io.cache.dataFolder = ":";
+        service.setOptions(opt);               
+    }//GEN-LAST:event_jrbFileOffActionPerformed
+
+    private void jrbNetOnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbNetOnActionPerformed
+        ServiceController.Options opt = service.getOptions();
+        opt.io.network.host = "127.0.0.1";
+        opt.io.network.port = 5000;        
+        service.setOptions(opt);               
+    }//GEN-LAST:event_jrbNetOnActionPerformed
+
+    private void jrbNetOffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbNetOffActionPerformed
+        ServiceController.Options opt = service.getOptions();
+        opt.io.network.host = ":";
+        opt.io.network.port = 5000;        
+        service.setOptions(opt);                      
+    }//GEN-LAST:event_jrbNetOffActionPerformed
         
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     ServiceController service = new ServiceController();    
     {
         service.startup();        
+    }
+    
+    
+    Socket sock;
+    {        
+        new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    ServerSocket srvSock = new ServerSocket(5000);
+                    while (true) {
+                        sock = srvSock.accept();
+                        Log.d(this, "Accepted connection!");
+                    }                    
+                } catch (IOException ex) {
+                    Logger.getLogger(JTestView.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }                
+        }.start();            
+    }
+    
+    StringBuffer netData = new StringBuffer();
+    void updateNetwork() {
+        try {
+            if (sock == null) {
+                return;
+            }
+            InputStream is = sock.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);            
+            
+            int count = 0;
+            while (isr.ready()) {
+                netData.append((char)isr.read());
+                count++;
+            }                       
+            
+            String netStr = netData.toString();
+            if (netStr.length() > 1024*16) {
+                netStr = netStr.substring(netStr.length() - 1024*16, netStr.length());
+            }
+            netStr = netStr.replaceAll(">", ">\n");
+            jtfNetwork.setText(netStr);
+            jtfNetwork.setCaretPosition(netStr.length());
+        } catch (IOException ex) {                        
+            sock = null;
+        }        
     }
     
     static {
@@ -608,6 +750,8 @@ public class JTestView extends javax.swing.JFrame {
     double speed = 5;
     double accuracy = 10;
     double battery = 50;
+    boolean locationOn = true;
+    int skip = 1;
     
     long oldTime = 0;
     long lastStatusUpdateTime = 0;
@@ -622,8 +766,9 @@ public class JTestView extends javax.swing.JFrame {
         
         @Override
         public void run() {
+            int nSkip = skip;
             while(true) {
-                long tf = timeFactor;
+                long tf = timeFactor;                                
                 if (tf == 0) {
                     pause(10);
                     continue;
@@ -636,14 +781,20 @@ public class JTestView extends javax.swing.JFrame {
                 if (System.currentTimeMillis() - lastStatusUpdateTime > 200) {
                     String status = gson.toJson(service.getStatus());
                     jtaStatus.setText(status);
+                    updateNetwork();
                 }
                 
                 if (time.time - oldTime >= 1000) {
-                    Location l = Location.fromParams(time.current(), 
-                        0, 0, 0, speed, 0, accuracy);                    
-                    service.getDataObserver().onLocation(l);
-                    service.getDataObserver().onBattery(battery);
                     oldTime = time.time;
+                    service.getDataObserver().onBattery(battery);                    
+                    
+                    nSkip--;
+                    if (locationOn && (nSkip <= 0)) {
+                        nSkip = skip;
+                        Location l = Location.fromParams(time.current(), 
+                            0, 0, 0, speed, 0, accuracy);                    
+                        service.getDataObserver().onLocation(l);
+                    }                    
                 }
             }
         }        
@@ -705,7 +856,6 @@ public class JTestView extends javax.swing.JFrame {
     private javax.swing.ButtonGroup bgPwr;
     private javax.swing.ButtonGroup bgSpd;
     private javax.swing.ButtonGroup bgTime;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel jlAcc;
@@ -743,6 +893,8 @@ public class JTestView extends javax.swing.JFrame {
     private javax.swing.JRadioButton jrbTime1;
     private javax.swing.JRadioButton jrbTime10;
     private javax.swing.JRadioButton jrbTime5;
+    private javax.swing.JScrollPane jspNetwork;
     private javax.swing.JTextArea jtaStatus;
+    private javax.swing.JTextArea jtfNetwork;
     // End of variables declaration//GEN-END:variables
 }

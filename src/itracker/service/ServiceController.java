@@ -20,12 +20,30 @@ public class ServiceController implements IServiceController {
         String username = "";
         String password = "";
         String imei = "";
+
+        @Override
+        protected Object clone() {
+            Credentials cred = new Credentials();
+            cred.username = username;
+            cred.password = password;
+            cred.imei = imei;
+            return cred;
+        }                
     }
     
     public static class Options {
         public Credentials credentials = new Credentials();
         public IoController.Options io = new IoController.Options();
         public CollectController.Options collect = new CollectController.Options();
+
+        @Override
+        public Object clone() {
+            Options o = new Options();
+            o.credentials = (Credentials)credentials.clone();
+            o.io = (IoController.Options)io.clone();
+            o.collect = (CollectController.Options)collect.clone();
+            return o;
+        }                
     }
     
     public static class Status {
@@ -43,6 +61,17 @@ public class ServiceController implements IServiceController {
     public void setLocationController(ILocationController lc) {
         locationController = lc;
     }
+
+    public void setOptions(Options options) {        
+        collect.setOptions(options.collect);        
+        io.setOptions(options.io);
+        this.options = options;
+        
+    }
+
+    public Options getOptions() {
+        return (Options)options.clone();
+    }        
     
     IDataObserver dataObserver = new IDataObserver() {
         @Override
@@ -95,8 +124,15 @@ public class ServiceController implements IServiceController {
                 io.update(sample);
             }
         });
+        collect.setOptions(options.collect);        
         collect.startup();
+        io.setOptions(options.io);
         io.startup();        
+    }
+    
+    public void cleanup() {
+        io.cleanup();
+        collect.cleanup();
     }
     
     public Status getStatus() {

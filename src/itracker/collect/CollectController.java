@@ -24,12 +24,32 @@ public class CollectController {
 
             public double minBattery = 30;
             public long stopTimeout = 600;
-            public long retryTimeout = 300;
-            public long retryDuration = 30;
+            public long noDataTimeout = 600;
+            public long testInterval = 300;
+            public long testDuration = 30;
+
+            @Override
+            public Object clone() {
+                AutoCollect ac = new AutoCollect();
+                ac.minBattery = minBattery;
+                ac.stopTimeout = stopTimeout;
+                ac.testInterval = testInterval;
+                ac.testDuration = testDuration;
+                return ac;
+            }                        
         }
         public AutoCollect auto = new AutoCollect();
         public boolean autoCollect = true;
         public double minBattery = 20;
+
+        @Override
+        public Object clone() {
+            Options o = new Options();
+            o.auto = (AutoCollect)auto.clone();
+            o.autoCollect = autoCollect;
+            o.minBattery = minBattery;
+            return o;
+        }                
     }
     
     public static class Status {
@@ -76,8 +96,8 @@ public class CollectController {
         switch(state) {
             case RUN:
             case RUN_P:
-            case RUN_K:                
-                strategy = checkedStrategy;
+            case RUN_K:   
+                strategy = checkedStrategy;                    
                 break;
             case RUN_KP:  
                 strategy = collectStrategy;
@@ -99,6 +119,15 @@ public class CollectController {
     
     public void cleanup() {
     }
+
+    public void setOptions(Options options) {
+        this.options = options;
+        checkedStrategy.setNoLocationTimeout(options.auto.noDataTimeout);
+        checkedStrategy.setTestDuration(options.auto.testDuration);
+        checkedStrategy.setTestInterval(options.auto.testInterval);
+        checkedStrategy.setStopTimeout(options.auto.stopTimeout);
+        checkedStrategy.reset();
+    }            
     
     public void onAction(boolean state) {        
         status.action = state;

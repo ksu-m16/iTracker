@@ -6,6 +6,7 @@ package itracker.io.net;
 
 import itracker.io.common.IRequest;
 import itracker.io.manager.AbstractIoManager;
+import itracker.util.Log;
 import itracker.util.Time;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,7 +19,7 @@ import java.net.UnknownHostException;
  */
 public class NetManager extends AbstractIoManager {
     
-    private long retryTimeout = 300;
+    private long retryTimeout = 300000;
     private String host = "";
     private int port = 0;    
     
@@ -43,7 +44,7 @@ public class NetManager extends AbstractIoManager {
     
     public void setConnectionParams(String host, int port) {
         this.host = host;
-        this.port = port;
+        this.port = port;        
         closeConnection();
     }
     
@@ -56,7 +57,7 @@ public class NetManager extends AbstractIoManager {
 
     private synchronized void closeConnection() {
         if (socket != null) {
-            try {
+            try {                
                 socket.close();
             } catch (IOException ex) {
             }
@@ -65,7 +66,7 @@ public class NetManager extends AbstractIoManager {
         lastConnectAttemptTime = 0;
     }
     
-    private synchronized boolean checkConnection() {
+    private synchronized boolean checkConnection() {                
         if (socket != null) {
             if (!socket.isClosed() && !socket.isOutputShutdown()) {
                 return true;
@@ -74,29 +75,35 @@ public class NetManager extends AbstractIoManager {
             socket = null;
         }
         
-        if (Time.current() - lastConnectAttemptTime < retryTimeout) {
+        if (Time.current() - lastConnectAttemptTime < retryTimeout) {            
             return false;
-        }
+        }                        
         lastConnectAttemptTime = Time.current();
         
-        try {
-            Socket s = new Socket(host, port);
+        if (!isRunning()) {
+            return false;
+        }
+        
+        try {            
+            socket = new Socket(host, port);        
         } catch (UnknownHostException ex) {
+            Log.e(this, ex);
             return false;
         } catch (IOException ex) {            
+            Log.e(this, ex);
             return false;
-        }        
-        
+        }                
+                
         return true;
     }
     
     @Override
     protected void startup() {
-        checkConnection();
+        checkConnection();        
     }
 
     @Override
-    protected void cleanup() {
+    protected void cleanup() {        
         closeConnection();
     }
 
@@ -104,7 +111,8 @@ public class NetManager extends AbstractIoManager {
     protected String process(IRequest request) {
         if (!checkConnection()) {        
             return "network not available";
-        }
+        }        
+        
         String data = request.getData();
         if (data == null) {
             return "empty data";
@@ -115,13 +123,14 @@ public class NetManager extends AbstractIoManager {
             os.write(data.getBytes());
             lastConnectAttemptTime = Time.current();
         } catch (IOException ex) {
+            Log.e(this, ex);
             closeConnection();            
         }
         
         return null;
     }
     
-    public boolean isReady() {
+    public boolean isReady() {        
         checkConnection();
         return (socket != null);
     }

@@ -27,18 +27,45 @@ public class IoController {
         public static class Network {
             public String host = "";
             public int port = 0;
-            public long netRetryTimeout = 60;
+            public long netRetryTimeout = 60000;
+
+            @Override
+            public Object clone() {
+                Network n = new Network();
+                n.host = host;
+                n.port = port;
+                n.netRetryTimeout = netRetryTimeout;
+                return n;
+            }                        
         }
 
         public static class Cache {
             public String dataFolder = "";
             public long fileSizeLimit = 64 * 1024;
             public long memoryLimit = 1024 * 1024;
+            
+            @Override
+            public Object clone() {
+                Cache c = new Cache();
+                c.dataFolder = dataFolder;
+                c.fileSizeLimit = fileSizeLimit;
+                c.memoryLimit = memoryLimit;
+                return c;
+            }            
         }
 
         public Network network = new Network();
         public Cache cache = new Cache();
-        public long ioUpdateInterval = 300;    
+        public long ioUpdateInterval = 300;
+
+        @Override
+        public Object clone() {
+            Options o = new Options();
+            o.network = (Network)network.clone();
+            o.cache = (Cache)cache.clone();
+            o.ioUpdateInterval = ioUpdateInterval;
+            return o;
+        }                
     }    
     
     public static class Status {
@@ -277,7 +304,7 @@ public class IoController {
     }
     
     public void setOptions(Options options) {
-        cleanup();        
+        cleanup();
         this.options = options;
         startup();
     }

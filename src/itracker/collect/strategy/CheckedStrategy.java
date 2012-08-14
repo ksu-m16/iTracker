@@ -39,12 +39,12 @@ public class CheckedStrategy extends AbstractStrategy {
         configureMotionDetector();
     }
 
-    public void setRetryInterval(long retryInterval) {
-        this.testInterval = retryInterval;
+    public void setTestInterval(long testInterval) {
+        this.testInterval = testInterval;
     }
 
-    public void setRetryDuration(long retryDuration) {
-        this.testDuration = retryDuration;
+    public void setTestDuration(long testDuration) {
+        this.testDuration = testDuration;
         configureMotionDetector();
     }
     
