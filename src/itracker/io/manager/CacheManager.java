@@ -7,6 +7,7 @@ package itracker.io.manager;
 import itracker.io.common.Request;
 import itracker.io.common.IRequest;
 import itracker.io.common.IResultListener;
+import itracker.util.Log;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -38,7 +39,7 @@ public abstract class CacheManager extends AbstractIoManager {
     }
     
     private void popEntry(Entry e) {        
-        if (cacheQueue.remove(e)) {
+        if (cacheQueue.remove(e)) {            
             e.remove();
         }
     }    
@@ -54,11 +55,11 @@ public abstract class CacheManager extends AbstractIoManager {
                     return;
                 }
                 MoveRequest mrq = (MoveRequest)rq;
-                mrq.remove();
+                mrq.remove();                                
             }
 
             @Override
-            public void onError(IoManager m, IRequest rq, String errorMessage) {
+            public void onError(IoManager m, IRequest rq, String errorMessage) {            
             }
         };
                 

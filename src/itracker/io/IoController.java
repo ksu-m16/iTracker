@@ -180,8 +180,15 @@ public class IoController {
     private static class IORequest implements IRequest {        
         private static final IResultListener listener = new IResultListener() {
             @Override
-            public void onSuccess(IoManager m, IRequest rq) {            
-                Log.d(rq, "io[" + m.getName() + "] reported success for '" + rq.getName() + "'");
+            public void onSuccess(IoManager m, IRequest rq) {
+                Log.d(rq, "io[" + m.getName() + "] reported success for '" + rq.getName() + "'");                
+                if (!(rq instanceof IORequest)) {
+                    return;
+                }          
+                IORequest iorq = (IORequest)rq;                                               
+                if (iorq.request != null) {                    
+                    iorq.request.getListener().onSuccess(m, iorq.request);
+                }
             }
 
             @Override
@@ -195,7 +202,12 @@ public class IoController {
                 
                 if (iorq.schedule()) {
                     return;
-                }                
+                }
+                
+                if (iorq.request != null) {
+                    iorq.request.getListener().onError(m, iorq.request, errorMessage);
+                }
+                
                 Log.d(iorq, "io stack for '" + rq.getName() + "' is empty, data discarded");                                    
             }
         };
